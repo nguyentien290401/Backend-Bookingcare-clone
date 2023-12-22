@@ -14,7 +14,7 @@ viewEngine(app);
 initWebRoutes(app);
 
 
-let port = process.env.PORT || 2402;
+let port = process.env.PORT || 1303;
 let hostname = process.env.HOST_NAME;
 
 app.listen(port, hostname, () => {
