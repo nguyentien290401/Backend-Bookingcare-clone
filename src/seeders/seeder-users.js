@@ -7,9 +7,11 @@ module.exports = {
       firstName: 'Admin',
       lastName: 'Lumine',
       address: 'Ho Chi Minh',
+      phonenumber: '0988832147',
       gender: 2,
-      typeRole: 'ROLE',
-      keyRole: 'R1',
+      image: 'Default Image',
+      positionId: 'S1',
+      roleId: 'R1',
       createdAt: new Date(),
       updatedAt: new Date()
     }]);
