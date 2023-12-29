@@ -66,5 +66,6 @@ let deleteCRUD = async (req, res) => {
 }
 
 module.exports = {
-    getHomePage, getAboutPage, getCRUD, postCRUD, displayCRUD, getEditCRUD, putCRUD, deleteCRUD
+    getHomePage: getHomePage, getAboutPage: getAboutPage, getCRUD: getCRUD, postCRUD: postCRUD,
+    displayCRUD: displayCRUD, getEditCRUD: getEditCRUD, putCRUD: putCRUD, deleteCRUD: deleteCRUD
 };
