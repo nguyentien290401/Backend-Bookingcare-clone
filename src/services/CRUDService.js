@@ -1,112 +1,100 @@
 import bcrypt from 'bcrypt';
 import db from '../models/index';
 
-let createNewUser = async (data) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-            await db.User.create({
-                email: data.email,
-                password: hashPasswordFromBcrypt,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                address: data.address,
-                phonenumber: data.phonenumber,
-                gender: data.gender === '1' ? true : false,
-                roleId: data.roleId
-            })
+const createNewUser = async (data) => {
+    try {
+        let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+        await db.User.create({
+            email: data.email,
+            password: hashPasswordFromBcrypt,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            address: data.address,
+            phonenumber: data.phonenumber,
+            gender: data.gender === '1' ? true : false,
+            roleId: data.roleId
+        })
 
-            resolve('Create a new user Successfully !');
+        return ('Create a new user Successfully !');
 
-        } catch (e) {
-            reject(e);
-        }
-    })
+    } catch (e) {
+        throw e;
+    }
 }
 
-let hashUserPassword = (password) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const salt = await bcrypt.genSaltSync(10);
-            let hashPassword = await bcrypt.hashSync(password, salt);
-            resolve(hashPassword);
-        } catch (e) {
-            reject(e);
-        }
-    })
+const hashUserPassword = async (password) => {
+    try {
+        const salt = await bcrypt.genSaltSync(10);
+        let hashPassword = await bcrypt.hashSync(password, salt);
+        return hashPassword;
+    } catch (e) {
+        throw e;
+    }
+};
+
+const getAllUser = async () => {
+    try {
+        let users = db.User.findAll({
+            raw: true
+        });
+        return users;
+    } catch (e) {
+        throw e;
+    }
 }
 
-let getAllUser = async () => {
-    return new Promise((resolve, reject) => {
-        try {
-            let users = db.User.findAll({
-                raw: true
-            });
-            resolve(users);
-        } catch (e) {
-            reject(e);
+const getUserInfoById = async (userId) => {
+    try {
+        let user = await db.User.findOne({
+            where: { id: userId },
+            raw: true
+        })
+        if (user) {
+            return user;
+
         }
-    })
+        else {
+            return [];
+        }
+    } catch (e) {
+        throw e
+    }
 }
 
-let getUserInfoById = (userId) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let user = await db.User.findOne({
-                where: { id: userId },
-                raw: true
-            })
-            if (user) {
-                resolve(user);
+const updateUserData = async (data) => {
+    try {
+        let user = await db.User.findOne({
+            where: { id: data.id }
+        })
+        if (user) {
+            user.firstName = data.firstName;
+            user.lastName = data.lastName;
+            user.address = data.address;
 
-            }
-            else {
-                resolve([]);
-            }
-        } catch (e) {
-            reject(e);
+            await user.save();
+            return;
         }
-    })
+        else {
+            return;
+        }
+    } catch (e) {
+        throw e
+    }
 }
 
-let updateUserData = (data) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let user = await db.User.findOne({
-                where: { id: data.id }
-            })
-            if (user) {
-                user.firstName = data.firstName;
-                user.lastName = data.lastName;
-                user.address = data.address;
-
-                await user.save();
-                resolve();
-            }
-            else {
-                resolve();
-            }
-        } catch (e) {
-            reject(e);
+const deleteUserById = async (userId) => {
+    try {
+        let user = await db.User.findOne({
+            where: { id: userId }
+        });
+        if (user) {
+            await user.destroy();
         }
-    })
-}
+        return;
 
-let deleteUserById = (userId) => {
-    return new Promise(async (resolbe, reject) => {
-        try {
-            let user = await db.User.findOne({
-                where: { id: userId }
-            });
-            if (user) {
-                await user.destroy();
-            }
-            resolbe();      // return;
-
-        } catch (e) {
-            reject(e);
-        }
-    })
+    } catch (e) {
+        throw e;
+    }
 }
 
 module.exports = {
