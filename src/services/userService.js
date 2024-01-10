@@ -103,18 +103,19 @@ const createNewUser = async (data) => {
                 errMessage: 'Email already exist. Plz try another email.'
             });
         }
-
-        let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-        await db.User.create({
-            email: data.email,
-            password: hashPasswordFromBcrypt,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            address: data.address,
-            phonenumber: data.phonenumber,
-            gender: data.gender === '1' ? true : false,
-            roleId: data.roleId
-        })
+        else {
+            let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+            await db.User.create({
+                email: data.email,
+                password: hashPasswordFromBcrypt,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                address: data.address,
+                phonenumber: data.phonenumber,
+                gender: data.gender === '1' ? true : false,
+                roleId: data.roleId
+            })
+        }
 
         return ({
             errCode: 0,
@@ -186,7 +187,33 @@ const updateAUser = async (data) => {
     }
 }
 
+const getAllCodeService = async (typeInput) => {
+    try {
+
+        if (!typeInput) {
+            return ({
+                errCode: 1,
+                errMessage: 'Mising required parameters!'
+            })
+        } else {
+            let res = {};
+
+            let allcode = await db.AllCode.findAll({
+                where: { type: typeInput }
+            });
+            res.errCode = 0;
+            res.data = allcode;
+
+            return res;
+        }
+
+    } catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     handleUserLogin: handleUserLogin, checkUserEmail: checkUserEmail, getAllUsers: getAllUsers,
-    createNewUser: createNewUser, deleteAUser: deleteAUser, updateAUser: updateAUser
+    createNewUser: createNewUser, deleteAUser: deleteAUser, updateAUser: updateAUser,
+    getAllCodeService: getAllCodeService
 }

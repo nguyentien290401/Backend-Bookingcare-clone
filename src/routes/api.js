@@ -11,6 +11,8 @@ let initApiRoutes = (app) => {
     router.put('/api/update-user', userController.handleUpdateAUser);
     router.delete('/api/delete-user', userController.handleDeleteAUser);
 
+    router.get('/api/allcode', userController.getAllCode);
+
     return app.use("/", router);
 }
 
