@@ -15,7 +15,10 @@ let initApiRoutes = (app) => {
     router.get('/api/allcode', userController.getAllCode);
 
 
-    router.get('/api/top-doctor', doctorController.getTopDoctor)
+    router.get('/api/top-doctor', doctorController.getTopDoctor);
+    router.get('/api/get-doctors', doctorController.getAllDoctors);
+    router.post('/api/save-doctor-detail', doctorController.postDoctorDetail)
+
 
     return app.use("/", router);
 }
