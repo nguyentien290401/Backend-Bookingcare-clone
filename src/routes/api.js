@@ -17,7 +17,8 @@ let initApiRoutes = (app) => {
 
     router.get('/api/top-doctor', doctorController.getTopDoctor);
     router.get('/api/get-doctors', doctorController.getAllDoctors);
-    router.post('/api/save-doctor-detail', doctorController.postDoctorDetail)
+    router.post('/api/save-doctor-detail', doctorController.postDoctorDetail);
+    router.get('/api/get-detail-doctor-by-id', doctorController.getDetailDoctorById);
 
 
     return app.use("/", router);

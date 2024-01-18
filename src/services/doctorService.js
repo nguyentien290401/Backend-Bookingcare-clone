@@ -68,7 +68,41 @@ let postDoctorDetailService = async (inputData) => {
     }
 }
 
+let getDetailDoctorByIdService = async (inputId) => {
+    try {
+        if (!inputId) {
+            return ({
+                errCode: 1,
+                errMessage: 'Missing required parameter !'
+            })
+        } else {
+            let data = await db.User.findOne({
+                where: { id: inputId },
+                attributes: {
+                    exclude: ['password', 'image']
+                },
+                include: [
+                    {
+                        model: db.Markdown,
+                        attributes: ['description', 'contentHTML', 'contentMarkdown']
+                    },
+                    { model: db.AllCode, as: 'positionData', attributes: ['valueEn', 'valueVi'] }
+                ],
+                raw: true,
+                nest: true
+            })
+
+            return ({
+                errCode: 0,
+                data: data
+            })
+        }
+    } catch (e) {
+        return console.log(e);
+    }
+}
+
 module.exports = {
     getTopDoctorService: getTopDoctorService, getAllDoctorsService: getAllDoctorsService,
-    postDoctorDetailService: postDoctorDetailService
+    postDoctorDetailService: postDoctorDetailService, getDetailDoctorByIdService: getDetailDoctorByIdService
 }
