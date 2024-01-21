@@ -45,18 +45,37 @@ let getAllDoctorsService = async (data) => {
 
 let postDoctorDetailService = async (inputData) => {
     try {
-        if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+        //  Check variable (include: action - status of variable Markdown)
+        if (!inputData.doctorId || !inputData.contentHTML
+            || !inputData.contentMarkdown || !inputData.action) {
             return {
                 errCode: 1,
                 errMessage: 'Mising required parameters !'
             }
         } else {
-            await db.Markdown.create({
-                contentHTML: inputData.contentHTML,
-                contentMarkdown: inputData.contentMarkdown,
-                description: inputData.description,
-                doctorId: inputData.doctorId
-            })
+            //  Check status of action
+            if (inputData.action === 'ADD') {
+                await db.Markdown.create({
+                    contentHTML: inputData.contentHTML,
+                    contentMarkdown: inputData.contentMarkdown,
+                    description: inputData.description,
+                    doctorId: inputData.doctorId
+                })
+            } else if (inputData.action === 'EDIT') {
+                let doctorMarkdown = await db.Markdown.findOne({
+                    where: { doctorId: inputData.doctorId },
+                    raw: false      // set false to set sequelize object (not js object)
+                })
+
+                if (doctorMarkdown) {
+                    doctorMarkdown.contentHTML = inputData.contentHTML;
+                    doctorMarkdown.contentMarkdown = inputData.contentMarkdown;
+                    doctorMarkdown.description = inputData.description;
+                    doctorMarkdown.updateAt = new Date();
+
+                    await doctorMarkdown.save();
+                }
+            }
 
             return {
                 errCode: 0,
@@ -79,7 +98,7 @@ let getDetailDoctorByIdService = async (inputId) => {
             let data = await db.User.findOne({
                 where: { id: inputId },
                 attributes: {
-                    exclude: ['password', 'image']
+                    exclude: ['password']
                 },
                 include: [
                     {
@@ -88,9 +107,18 @@ let getDetailDoctorByIdService = async (inputId) => {
                     },
                     { model: db.AllCode, as: 'positionData', attributes: ['valueEn', 'valueVi'] }
                 ],
-                raw: true,
-                nest: true
+                raw: false,  // true -> Sequelize object, false: javascript object   
+                nest: true  // do action with database need at form sequelize object
             })
+
+            //  Converting image to base64 if have data
+            if (data && data.image) {
+                data.image = new Buffer(data.image, 'base64').toString('binary');
+            }
+
+            //  Always return a null object data
+            if (!data)
+                data = {};
 
             return ({
                 errCode: 0,
