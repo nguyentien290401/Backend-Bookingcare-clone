@@ -190,8 +190,36 @@ let bulkCreateScheduleService = async (data) => {
     }
 }
 
+let getScheduleDoctorByDateService = async (doctorId, date) => {
+    try {
+        if (!doctorId || !date) {
+            return ({
+                errCode: 1,
+                errMessage: 'Missing required parameters !'
+            })
+        } else {
+            let dataSchedule = await db.Schedule.findAll({
+                where: {
+                    doctorId: doctorId,
+                    date: date
+                }
+            })
+
+            if (!dataSchedule) dataSchedule = [];
+
+            return ({
+                errCode: 0,
+                data: dataSchedule
+            })
+        }
+    } catch (e) {
+
+    }
+}
+
 module.exports = {
     getTopDoctorService: getTopDoctorService, getAllDoctorsService: getAllDoctorsService,
     postDoctorDetailService: postDoctorDetailService, getDetailDoctorByIdService: getDetailDoctorByIdService,
-    bulkCreateScheduleService: bulkCreateScheduleService
+    bulkCreateScheduleService: bulkCreateScheduleService,
+    getScheduleDoctorByDateService: getScheduleDoctorByDateService
 }
