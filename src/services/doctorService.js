@@ -160,17 +160,10 @@ let bulkCreateScheduleService = async (data) => {
                     raw: true
                 });
 
-            // Format date the same as client side
-            if (existing && existing.length > 0) {
-                existing = existing.map(item => {
-                    item.date = new Date(item.date).getTime();
-                    return item;
-                })
-            }
 
             // Compare 2 object different or not
             let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-                return a.timeType === b.timeType && a.date === b.date;
+                return a.timeType === b.timeType && +a.date === +b.date;
             });
             console.log('Check different: ', toCreate);
 
@@ -202,7 +195,12 @@ let getScheduleDoctorByDateService = async (doctorId, date) => {
                 where: {
                     doctorId: doctorId,
                     date: date
-                }
+                },
+                include: [
+                    { model: db.AllCode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] }
+                ],
+                raw: false,  // true -> Sequelize object, false: javascript object   
+                nest: true  // do action with database need at form sequelize object
             })
 
             if (!dataSchedule) dataSchedule = [];
