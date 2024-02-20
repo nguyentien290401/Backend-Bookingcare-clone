@@ -258,7 +258,46 @@ let getScheduleDoctorByDateService = async (doctorId, date) => {
             })
         }
     } catch (e) {
+        return console.log(e);
+    }
+}
 
+let getExtraInforDoctorByIdService = async (doctorId) => {
+    try {
+        if (!doctorId) {
+            return ({
+                errCode: 1,
+                errMessage: 'Missing required parameters'
+            })
+        } else {
+            let data = await db.Doctor_Infor.findOne({
+                where: {
+                    doctorId: doctorId
+                },
+                attributes: {
+                    exclude: ['id', 'doctorId']
+                },
+                include: [
+                    { model: db.AllCode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                    { model: db.AllCode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                    { model: db.AllCode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                ],
+                raw: false,  // true -> Sequelize object, false: javascript object   
+                nest: true  // do action with database need at form sequelize object
+            })
+
+            if (!data)
+                data = {};
+
+            return ({
+                errCode: 0,
+                data: data
+            })
+        }
+
+
+    } catch (e) {
+        return console.log(e);
     }
 }
 
@@ -266,5 +305,6 @@ module.exports = {
     getTopDoctorService: getTopDoctorService, getAllDoctorsService: getAllDoctorsService,
     postDoctorDetailService: postDoctorDetailService, getDetailDoctorByIdService: getDetailDoctorByIdService,
     bulkCreateScheduleService: bulkCreateScheduleService,
-    getScheduleDoctorByDateService: getScheduleDoctorByDateService
+    getScheduleDoctorByDateService: getScheduleDoctorByDateService,
+    getExtraInforDoctorByIdService: getExtraInforDoctorByIdService
 }
