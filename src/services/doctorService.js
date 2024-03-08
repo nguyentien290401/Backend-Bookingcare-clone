@@ -301,10 +301,65 @@ let getExtraInforDoctorByIdService = async (doctorId) => {
     }
 }
 
+let getProfileDoctorByIdService = async (doctorId) => {
+    try {
+        if (!doctorId) {
+            return ({
+                errCode: 1,
+                errMessage: 'Missing required parameters'
+            })
+        } else {
+            let data = await db.User.findOne({
+                where: { id: doctorId },
+                attributes: {
+                    exclude: ['password']
+                },
+                include: [
+                    {
+                        model: db.Markdown,
+                        attributes: ['description', 'contentHTML', 'contentMarkdown']
+                    },
+                    {
+                        model: db.Doctor_Infor,
+                        attributes: {
+                            exclude: ['id', 'doctorId']
+                        },
+                        include: [
+                            { model: db.AllCode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                            { model: db.AllCode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                            { model: db.AllCode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                        ]
+                    },
+                    { model: db.AllCode, as: 'positionData', attributes: ['valueEn', 'valueVi'] }
+                ],
+                raw: false,  // true -> Sequelize object, false: javascript object   
+                nest: true  // do action with database need at form sequelize object
+            })
+
+            //  Converting image to base64 if have data
+            if (data && data.image) {
+                data.image = new Buffer(data.image, 'base64').toString('binary');
+            }
+
+            //  Always return a null object data
+            if (!data)
+                data = {};
+
+            return ({
+                errCode: 0,
+                data: data
+            })
+        }
+    } catch (e) {
+        return console.log(e);
+    }
+}
+
 module.exports = {
     getTopDoctorService: getTopDoctorService, getAllDoctorsService: getAllDoctorsService,
     postDoctorDetailService: postDoctorDetailService, getDetailDoctorByIdService: getDetailDoctorByIdService,
     bulkCreateScheduleService: bulkCreateScheduleService,
     getScheduleDoctorByDateService: getScheduleDoctorByDateService,
-    getExtraInforDoctorByIdService: getExtraInforDoctorByIdService
+    getExtraInforDoctorByIdService: getExtraInforDoctorByIdService,
+    getProfileDoctorByIdService: getProfileDoctorByIdService
 }
